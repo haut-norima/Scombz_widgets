@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  課題ウィジェット プレビュー画像
+  ウィジェット選択画面に表示されるサムネイル
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="160dp"
+    android:viewportWidth="320"
+    android:viewportHeight="160">
+
+  <!-- 背景カード -->
+  <path android:fillColor="#F5F5F5"
+        android:pathData="M12,8 L308,8 Q312,8 312,12 L312,148 Q312,152 308,152 L12,152 Q8,152 8,148 L8,12 Q8,8 12,8 Z"/>
+
+  <!-- ヘッダー: "課題" ラベル -->
+  <path android:fillColor="#E65100"
+        android:pathData="M24,22 L68,22 Q70,22 70,24 L70,34 Q70,36 68,36 L24,36 Q22,36 22,34 L22,24 Q22,22 24,22 Z"/>
+
+  <!-- 件数テキスト -->
+  <path android:fillColor="#BBBBBB"
+        android:pathData="M210,25 L280,25 Q281,25 281,26 L281,33 Q281,34 280,34 L210,34 Q209,34 209,33 L209,26 Q209,25 210,25 Z"/>
+
+  <!-- 課題カード1（緊急 - 赤背景） -->
+  <path android:fillColor="#FFEBEE"
+        android:pathData="M16,48 L304,48 Q308,48 308,52 L308,80 Q308,84 304,84 L16,84 Q12,84 12,80 L12,52 Q12,48 16,48 Z"/>
+
+  <!-- 課題タイトル -->
+  <path android:fillColor="#B71C1C"
+        android:pathData="M24,56 L200,56 Q201,56 201,57 L201,64 Q201,65 200,65 L24,65 Q23,65 23,64 L23,57 Q23,56 24,56 Z"/>
+  <!-- 科目名 -->
+  <path android:fillColor="#757575"
+        android:pathData="M24,68 L130,68 Q131,68 131,69 L131,75 Q131,76 130,76 L24,76 Q23,76 23,75 L23,69 Q23,68 24,68 Z"/>
+  <!-- 残り時間 -->
+  <path android:fillColor="#D32F2F"
+        android:pathData="M240,54 L298,54 Q299,54 299,55 L299,78 Q299,79 298,79 L240,79 Q239,79 239,78 L239,55 Q239,54 240,54 Z"/>
+
+  <!-- 課題カード2（注意 - 黄背景） -->
+  <path android:fillColor="#FFF8E1"
+        android:pathData="M16,90 L304,90 Q308,90 308,94 L308,122 Q308,126 304,126 L16,126 Q12,126 12,122 L12,94 Q12,90 16,90 Z"/>
+
+  <path android:fillColor="#E65100"
+        android:pathData="M24,98 L180,98 Q181,98 181,99 L181,106 Q181,107 180,107 L24,107 Q23,107 23,106 L23,99 Q23,98 24,98 Z"/>
+  <path android:fillColor="#757575"
+        android:pathData="M24,110 L120,110 Q121,110 121,111 L121,117 Q121,118 120,118 L24,118 Q23,118 23,117 L23,111 Q23,110 24,110 Z"/>
+  <path android:fillColor="#F57F17"
+        android:pathData="M240,96 L298,96 Q299,96 299,97 L299,120 Q299,121 298,121 L240,121 Q239,121 239,120 L239,97 Q239,96 240,96 Z"/>
+</vector>

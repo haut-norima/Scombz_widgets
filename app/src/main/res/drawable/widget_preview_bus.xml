@@ -1,0 +1,48 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  バス時刻ウィジェット プレビュー画像
+  ウィジェット選択画面に表示されるサムネイル
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="130dp"
+    android:viewportWidth="320"
+    android:viewportHeight="130">
+
+  <!-- 背景カード -->
+  <path android:fillColor="#F5F5F5"
+        android:pathData="M12,8 L308,8 Q312,8 312,12 L312,118 Q312,122 308,122 L12,122 Q8,122 8,118 L8,12 Q8,8 12,8 Z"/>
+
+  <!-- ヘッダー: "バス時刻" ラベル -->
+  <path android:fillColor="#2E7D32"
+        android:pathData="M24,18 L88,18 Q90,18 90,20 L90,32 Q90,34 88,34 L24,34 Q22,34 22,32 L22,20 Q22,18 24,18 Z"/>
+
+  <!-- キャンパス名 -->
+  <path android:fillColor="#BBBBBB"
+        android:pathData="M180,21 L290,21 Q291,21 291,22 L291,30 Q291,31 290,31 L180,31 Q179,31 179,30 L179,22 Q179,21 180,21 Z"/>
+
+  <!-- 駅→学校カード -->
+  <path android:fillColor="#FFFFFF"
+        android:pathData="M16,42 L148,42 Q152,42 152,46 L152,108 Q152,112 148,112 L16,112 Q12,112 12,108 L12,46 Q12,42 16,42 Z"/>
+
+  <!-- 駅→学校 ラベル -->
+  <path android:fillColor="#388E3C"
+        android:pathData="M22,50 L142,50 Q143,50 143,51 L143,60 Q143,61 142,61 L22,61 Q21,61 21,60 L21,51 Q21,50 22,50 Z"/>
+  <!-- 時刻 -->
+  <path android:fillColor="#1B5E20"
+        android:pathData="M30,68 L138,68 Q139,68 139,69 L139,84 Q139,85 138,85 L30,85 Q29,85 29,84 L29,69 Q29,68 30,68 Z"/>
+  <!-- 残り時間 -->
+  <path android:fillColor="#A5D6A7"
+        android:pathData="M40,90 L128,90 Q129,90 129,91 L129,104 Q129,105 128,105 L40,105 Q39,105 39,104 L39,91 Q39,90 40,90 Z"/>
+
+  <!-- 学校→駅カード -->
+  <path android:fillColor="#FFFFFF"
+        android:pathData="M158,42 L304,42 Q308,42 308,46 L308,108 Q308,112 304,112 L158,112 Q154,112 154,108 L154,46 Q154,42 158,42 Z"/>
+
+  <path android:fillColor="#1565C0"
+        android:pathData="M164,50 L298,50 Q299,50 299,51 L299,60 Q299,61 298,61 L164,61 Q163,61 163,60 L163,51 Q163,50 164,50 Z"/>
+  <path android:fillColor="#0D47A1"
+        android:pathData="M172,68 L290,68 Q291,68 291,69 L291,84 Q291,85 290,85 L172,85 Q171,85 171,84 L171,69 Q171,68 172,68 Z"/>
+  <path android:fillColor="#90CAF9"
+        android:pathData="M182,90 L280,90 Q281,90 281,91 L281,104 Q281,105 280,105 L182,105 Q181,105 181,104 L181,91 Q181,90 182,90 Z"/>
+</vector>

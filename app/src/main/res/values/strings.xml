@@ -1,0 +1,13 @@
+<resources>
+    <string name="app_name">ScombZ Widgets</string>
+
+    <!-- ウィジェット選択画面に表示される名前 -->
+    <string name="widget_timetable_label">時間割</string>
+    <string name="widget_assignment_label">課題・締切</string>
+    <string name="widget_bus_label">バス時刻</string>
+
+    <!-- ウィジェット選択画面に表示される説明文 -->
+    <string name="widget_timetable_description">今日の授業と現在の時限をホーム画面に表示します</string>
+    <string name="widget_assignment_description">未提出の課題と締切までの残り時間を表示します</string>
+    <string name="widget_bus_description">大宮キャンパスの次のスクールバス発車時刻を表示します</string>
+</resources>

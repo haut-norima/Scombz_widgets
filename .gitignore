@@ -1,0 +1,59 @@
+# ===== Android =====
+*.apk
+*.aab
+*.ap_
+*.dex
+*.class
+
+# Built artifacts
+/build/
+app/build/
+
+# Keystore files (絶対にコミットしない)
+*.jks
+*.keystore
+*.p12
+*.pfx
+
+# Local configuration (環境依存・秘密情報を含む)
+local.properties
+keystore.properties
+
+# Proguard mapping
+*.map
+
+# Log files
+*.log
+
+# ===== Android Studio / IntelliJ IDEA =====
+.idea/
+*.iml
+*.ipr
+*.iws
+captures/
+.externalNativeBuild/
+.cxx/
+
+# Gradle
+.gradle/
+gradle/wrapper/gradle-wrapper.jar
+!gradle/wrapper/gradle-wrapper.properties
+
+# ===== OS =====
+.DS_Store
+Thumbs.db
+
+# ===== Flutter / Dart =====
+.dart_tool/
+.flutter-plugins
+.flutter-plugins-dependencies
+.pub-cache/
+.pub/
+/coverage/
+
+# ===== Claude Code =====
+.claude/
+
+# ===== Misc =====
+*.swp
+*.pyc

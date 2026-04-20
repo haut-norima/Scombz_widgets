@@ -1,0 +1,52 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!--
+  時間割ウィジェット プレビュー画像
+  ウィジェット選択画面に表示されるサムネイル
+-->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="320dp"
+    android:height="160dp"
+    android:viewportWidth="320"
+    android:viewportHeight="160">
+
+  <!-- 背景カード -->
+  <path android:fillColor="#F5F5F5"
+        android:pathData="M12,8 L308,8 Q312,8 312,12 L312,148 Q312,152 308,152 L12,152 Q8,152 8,148 L8,12 Q8,8 12,8 Z"/>
+
+  <!-- ヘッダー: "時間割" ラベル -->
+  <path android:fillColor="#1A73E8"
+        android:pathData="M24,22 L80,22 Q82,22 82,24 L82,34 Q82,36 80,36 L24,36 Q22,36 22,34 L22,24 Q22,22 24,22 Z"/>
+
+  <!-- 曜日テキスト用プレースホルダー -->
+  <path android:fillColor="#BBBBBB"
+        android:pathData="M200,25 L280,25 Q281,25 281,26 L281,33 Q281,34 280,34 L200,34 Q199,34 199,33 L199,26 Q199,25 200,25 Z"/>
+
+  <!-- 授業カード1（現在の授業 - 青背景） -->
+  <path android:fillColor="#E3F2FD"
+        android:pathData="M16,48 L304,48 Q308,48 308,52 L308,82 Q308,86 304,86 L16,86 Q12,86 12,82 L12,52 Q12,48 16,48 Z"/>
+
+  <!-- 時限ラベル -->
+  <path android:fillColor="#1A73E8"
+        android:pathData="M22,55 L50,55 Q52,55 52,57 L52,77 Q52,79 50,79 L22,79 Q20,79 20,77 L20,57 Q20,55 22,55 Z"/>
+
+  <!-- 授業名テキスト -->
+  <path android:fillColor="#212121"
+        android:pathData="M60,57 L220,57 Q221,57 221,58 L221,65 Q221,66 220,66 L60,66 Q59,66 59,65 L59,58 Q59,57 60,57 Z"/>
+
+  <!-- 教室テキスト -->
+  <path android:fillColor="#757575"
+        android:pathData="M60,69 L160,69 Q161,69 161,70 L161,76 Q161,77 160,77 L60,77 Q59,77 59,76 L59,70 Q59,69 60,69 Z"/>
+
+  <!-- 授業カード2 -->
+  <path android:fillColor="#FFFFFF"
+        android:pathData="M16,92 L304,92 Q308,92 308,96 L308,126 Q308,130 304,130 L16,130 Q12,130 12,126 L12,96 Q12,92 16,92 Z"/>
+
+  <path android:fillColor="#BDBDBD"
+        android:pathData="M22,99 L50,99 Q52,99 52,101 L52,121 Q52,123 50,123 L22,123 Q20,123 20,121 L20,101 Q20,99 22,99 Z"/>
+
+  <path android:fillColor="#212121"
+        android:pathData="M60,101 L200,101 Q201,101 201,102 L201,109 Q201,110 200,110 L60,110 Q59,110 59,109 L59,102 Q59,101 60,101 Z"/>
+
+  <path android:fillColor="#757575"
+        android:pathData="M60,113 L145,113 Q146,113 146,114 L146,120 Q146,121 145,121 L60,121 Q59,121 59,120 L59,114 Q59,113 60,113 Z"/>
+</vector>
