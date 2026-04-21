@@ -2,13 +2,20 @@ package com.testapp.scombz_widgets.data.model
 
 /**
  * バス時刻表の1時間分のエントリ
+ *
+ * [toSchoolIsOnDemand] / [fromSchoolIsOnDemand] は、
+ * num1・num2・memo1・memo2 のいずれかに「適時運行」が含まれる場合 true。
+ * num フィールドにテキストとして「適時運行」が入るケースも検出するために
+ * parseMinutes とは別に判定する。
  */
 data class BusHourEntry(
     val hour: Int,
-    val toSchoolMinutes: List<Int>,     // 駅→学校 (bus_right.num1 + num2)
-    val fromSchoolMinutes: List<Int>,   // 学校→駅 (bus_left.num1 + num2)
-    val toSchoolMemo: String,           // 適時運行メモなど
-    val fromSchoolMemo: String
+    val toSchoolMinutes: List<Int>,       // 駅→学校 の定刻（分）
+    val fromSchoolMinutes: List<Int>,     // 学校→駅 の定刻（分）
+    val toSchoolMemo: String,             // 補足テキスト
+    val fromSchoolMemo: String,
+    val toSchoolIsOnDemand: Boolean = false,   // 駅→学校 に適時運行あり
+    val fromSchoolIsOnDemand: Boolean = false  // 学校→駅 に適時運行あり
 )
 
 /**

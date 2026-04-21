@@ -38,6 +38,7 @@ import com.testapp.scombz_widgets.data.model.NextBusInfo
 object BusDataParser {
 
     private val MINUTE_REGEX = Regex("""[a-z]*(\d+)""", RegexOption.IGNORE_CASE)
+    private val ON_DEMAND_KEYWORDS = listOf("適時運行", "適時", "随時")
 
     /**
      * JSON文字列をパースしてTimesheetリストを返す
@@ -86,12 +87,28 @@ object BusDataParser {
                     busRight?.get("memo2")?.asString?.takeIf { it.isNotBlank() }
                 ).joinToString(" ")
 
+                // num フィールドにテキストとして入る場合も含めて適時運行を検出
+                val toSchoolIsOnDemand = containsOnDemand(
+                    busLeft?.get("num1")?.asString,
+                    busLeft?.get("num2")?.asString,
+                    busLeft?.get("memo1")?.asString,
+                    busLeft?.get("memo2")?.asString
+                )
+                val fromSchoolIsOnDemand = containsOnDemand(
+                    busRight?.get("num1")?.asString,
+                    busRight?.get("num2")?.asString,
+                    busRight?.get("memo1")?.asString,
+                    busRight?.get("memo2")?.asString
+                )
+
                 BusHourEntry(
                     hour = hour,
                     toSchoolMinutes = toSchoolNums,
                     fromSchoolMinutes = fromSchoolNums,
                     toSchoolMemo = toSchoolMemo,
-                    fromSchoolMemo = fromSchoolMemo
+                    fromSchoolMemo = fromSchoolMemo,
+                    toSchoolIsOnDemand = toSchoolIsOnDemand,
+                    fromSchoolIsOnDemand = fromSchoolIsOnDemand
                 )
             }
 
@@ -102,6 +119,16 @@ object BusDataParser {
                 note = note,
                 entries = entries
             )
+        }
+    }
+
+    /**
+     * 指定フィールドのいずれかに適時運行を示すキーワードが含まれるか判定。
+     * num フィールドにテキストとして "適時運行" が入るケースも検出する。
+     */
+    private fun containsOnDemand(vararg fields: String?): Boolean {
+        return fields.any { field ->
+            field != null && ON_DEMAND_KEYWORDS.any { kw -> field.contains(kw) }
         }
     }
 
@@ -143,29 +170,30 @@ object BusDataParser {
 
             val minutes = if (toSchool) entry.toSchoolMinutes else entry.fromSchoolMinutes
             val memo = if (toSchool) entry.toSchoolMemo else entry.fromSchoolMemo
+            val isOnDemand = if (toSchool) entry.toSchoolIsOnDemand else entry.fromSchoolIsOnDemand
 
             if (entry.hour == currentHour) {
-                // 同じ時間帯 → 現在の分より後の出発時刻を探す
+                // 同じ時間帯 → 現在の分より後の定刻出発を探す
                 val nextMin = minutes.firstOrNull { it > currentMinute }
                 if (nextMin != null) {
-                    val until = (entry.hour - currentHour) * 60 + (nextMin - currentMinute)
+                    val until = nextMin - currentMinute
                     return NextBusInfo(
                         minutesUntil = until,
                         departureHour = entry.hour,
                         departureMinute = nextMin
                     )
                 }
-                // この時間帯に次のバスがない場合、メモがあれば適時運行の可能性
-                if (minutes.isEmpty() && memo.isNotBlank() && memo.contains("適時運行")) {
+                // 定刻がない（または全て過去）かつ適時運行あり → 適時運行を返す
+                if (isOnDemand) {
                     return NextBusInfo(
                         minutesUntil = 0,
                         departureHour = entry.hour,
                         departureMinute = currentMinute,
-                        memo = memo
+                        memo = memo.ifBlank { "適時運行" }
                     )
                 }
             } else {
-                // 次の時間帯
+                // 未来の時間帯 → 定刻があればその最初を返す
                 if (minutes.isNotEmpty()) {
                     val firstMin = minutes.first()
                     val until = (entry.hour - currentHour) * 60 + (firstMin - currentMinute)
@@ -175,14 +203,17 @@ object BusDataParser {
                         departureMinute = firstMin
                     )
                 }
-                if (memo.isNotBlank() && memo.contains("適時運行")) {
+                // 定刻なし・適時運行あり → 適時運行を返す（この時間帯の00分扱い）
+                if (isOnDemand) {
+                    val until = (entry.hour - currentHour) * 60 - currentMinute
                     return NextBusInfo(
-                        minutesUntil = (entry.hour - currentHour) * 60 - currentMinute,
+                        minutesUntil = until,
                         departureHour = entry.hour,
                         departureMinute = 0,
-                        memo = memo
+                        memo = memo.ifBlank { "適時運行" }
                     )
                 }
+                // 定刻も適時運行もない時間帯はスキップ
             }
         }
         return null // 本日のバスは終了
