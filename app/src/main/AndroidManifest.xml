@@ -7,6 +7,8 @@
     <!-- ウィジェット1分更新用 -->
     <uses-permission android:name="android.permission.RECEIVE_BOOT_COMPLETED" />
     <uses-permission android:name="android.permission.SCHEDULE_EXACT_ALARM" />
+    <!-- バッテリー最適化除外リクエスト用（OEMの独自電力管理によるアラーム遮断を防ぐ） -->
+    <uses-permission android:name="android.permission.REQUEST_IGNORE_BATTERY_OPTIMIZATIONS" />
 
     <application
             android:allowBackup="true"
@@ -81,12 +83,14 @@
         </receiver>
 
         <!-- ウィジェット1分ごとUI更新レシーバー -->
+        <!-- exported="true" は BOOT_COMPLETED / MY_PACKAGE_REPLACED（システム送信）を受け取るために必要 -->
         <receiver
                 android:name=".widget.WidgetUpdateReceiver"
-                android:exported="false">
+                android:exported="true">
             <intent-filter>
                 <action android:name="com.testapp.scombz_widgets.WIDGET_TICK" />
                 <action android:name="android.intent.action.BOOT_COMPLETED" />
+                <action android:name="android.intent.action.MY_PACKAGE_REPLACED" />
             </intent-filter>
         </receiver>
 

@@ -23,9 +23,14 @@ class DataSyncWorker(
 ) : CoroutineWorker(appContext, params) {
 
     override suspend fun doWork(): Result {
+        // バスデータはログイン不要のため、常に先に同期する
+        val busRepository = BusRepository(applicationContext)
+        busRepository.syncBusData()
+        BusWidget.updateWidget(applicationContext)
+
         val repository = ScombzRepository(applicationContext)
 
-        // Cookie が保存されていなければスキップ
+        // Cookie が保存されていなければバス同期のみで終了
         repository.loadCookies() ?: return Result.success()
 
         var hasError = false
@@ -36,7 +41,6 @@ class DataSyncWorker(
                 // セッション切れ：Cookie はリポジトリ側でクリア済み。リトライ不要
                 TimetableWidget.updateWidget(applicationContext)
                 AssignmentWidget.updateWidget(applicationContext)
-                BusWidget.updateWidget(applicationContext)
                 return Result.success()
             }
             hasError = true
@@ -47,20 +51,14 @@ class DataSyncWorker(
             if (e is SessionExpiredException) {
                 TimetableWidget.updateWidget(applicationContext)
                 AssignmentWidget.updateWidget(applicationContext)
-                BusWidget.updateWidget(applicationContext)
                 return Result.success()
             }
             hasError = true
         }
 
-        // バスデータの同期
-        val busRepository = BusRepository(applicationContext)
-        busRepository.syncBusData()
-
         // ウィジェットの更新
         TimetableWidget.updateWidget(applicationContext)
         AssignmentWidget.updateWidget(applicationContext)
-        BusWidget.updateWidget(applicationContext)
 
         return if (hasError) Result.retry() else Result.success()
     }

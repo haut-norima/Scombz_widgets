@@ -1,5 +1,6 @@
 package com.testapp.scombz_widgets.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -45,6 +46,9 @@ import java.time.LocalDateTime
 class AssignmentWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        // 描画のたびにアラームチェーンを再スケジュール（APK更新等で切れても自己修復）
+        WidgetUpdateScheduler.start(context)
+
         val repository = ScombzRepository(context)
         val now = LocalDateTime.now()
         val assignments = repository.loadMergedAssignments(now)
@@ -134,7 +138,7 @@ private fun AssignmentWidgetContent(
                     ColorProvider(SubText, SubTextDark)
                 ),
                 modifier = GlanceModifier
-                    .size(22.dp)
+                    .size(32.dp)
                     .clickable(actionRunCallback<AssignmentRefreshAction>())
             )
         }
@@ -273,6 +277,12 @@ private fun AssignmentItem(
 
 class AssignmentWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = AssignmentWidget()
+
+    /** APKインストール・更新後にシステムが呼ぶ → アラームを再起動 */
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        WidgetUpdateScheduler.start(context)
+    }
 
     /** 最初の課題ウィジェットが追加されたとき → スケジューラ開始 */
     override fun onEnabled(context: Context) {

@@ -1,6 +1,12 @@
 package com.testapp.scombz_widgets
 
+import android.app.AlarmManager
+import android.content.Intent
+import android.net.Uri
+import android.os.Build
 import android.os.Bundle
+import android.os.PowerManager
+import android.provider.Settings
 import android.widget.Toast
 import androidx.activity.ComponentActivity
 import androidx.activity.compose.setContent
@@ -137,6 +143,36 @@ class MainActivity : ComponentActivity() {
         enableEdgeToEdge()
         repository = ScombzRepository(this)
 
+        // バス同期はログイン不要のため、起動時に常にスケジュール
+        DataSyncWorker.schedule(this)
+
+        // バッテリー最適化の除外をリクエスト（毎分アラームが OEM の電力管理で遮断されるのを防ぐ）
+        val pm = getSystemService(PowerManager::class.java)
+        if (pm != null && !pm.isIgnoringBatteryOptimizations(packageName)) {
+            startActivity(
+                Intent(Settings.ACTION_REQUEST_IGNORE_BATTERY_OPTIMIZATIONS).apply {
+                    data = Uri.parse("package:$packageName")
+                }
+            )
+        }
+
+        // Android 12+: 正確なアラームの権限がなければ設定画面へ誘導する
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            val alarmManager = getSystemService(AlarmManager::class.java)
+            if (alarmManager != null && !alarmManager.canScheduleExactAlarms()) {
+                Toast.makeText(
+                    this,
+                    "ウィジェットの毎分更新のため「アラームとリマインダー」を許可してください",
+                    Toast.LENGTH_LONG
+                ).show()
+                startActivity(
+                    Intent(Settings.ACTION_REQUEST_SCHEDULE_EXACT_ALARM).apply {
+                        data = Uri.parse("package:$packageName")
+                    }
+                )
+            }
+        }
+
         setContent {
             ScombzwidgetsTheme {
                 MainScreen(
@@ -148,7 +184,7 @@ class MainActivity : ComponentActivity() {
                     onLogoutClick = {
                         kotlinx.coroutines.CoroutineScope(kotlinx.coroutines.Dispatchers.Main).launch {
                             repository.clearCookies()
-                            DataSyncWorker.cancel(this@MainActivity)
+                            // DataSyncWorkerはバス同期のため継続（ScombZ同期はCookie不要チェックでスキップされる）
                             Toast.makeText(this@MainActivity, "ログアウトしました", Toast.LENGTH_SHORT).show()
                             syncTrigger++
                         }

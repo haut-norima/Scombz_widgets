@@ -1,5 +1,6 @@
 package com.testapp.scombz_widgets.widget
 
+import android.appwidget.AppWidgetManager
 import android.content.Context
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.graphics.Color
@@ -37,14 +38,36 @@ import androidx.glance.text.TextStyle
 import com.testapp.scombz_widgets.MainActivity
 import com.testapp.scombz_widgets.R
 import com.testapp.scombz_widgets.data.model.NextBusInfo
+import com.testapp.scombz_widgets.data.parser.BusDataParser
 import com.testapp.scombz_widgets.data.repository.BusRepository
+import java.time.LocalDateTime
 
 class BusWidget : GlanceAppWidget() {
 
     override suspend fun provideGlance(context: Context, id: GlanceId) {
+        // 描画のたびにアラームチェーンを再スケジュール（APK更新等で切れても自己修復）
+        WidgetUpdateScheduler.start(context)
+
         val repository = BusRepository(context)
-        val nextToSchool = repository.getNextBusToSchool()
-        val nextFromSchool = repository.getNextBusFromSchool()
+        val now = LocalDateTime.now()
+
+        // ネットワーク通信は行わずキャッシュのみを使用する。
+        // これにより毎分確実に表示が更新される。
+        // サーバーからのスケジュール取得は DataSyncWorker（1時間ごと）と
+        // 手動リロードボタン（BusRefreshAction）が担う。
+        var timesheets = repository.loadCachedData()
+        if (timesheets.isEmpty()) {
+            // キャッシュが空の場合（初回起動時）のみ同期取得する
+            timesheets = repository.syncBusData().getOrDefault(emptyList())
+        }
+
+        val sheet = BusDataParser.selectTimesheetForToday(timesheets, now.dayOfWeek.value)
+        val nextToSchool = sheet?.let {
+            BusDataParser.findNextBus(it, now.hour, now.minute, toSchool = true)
+        }
+        val nextFromSchool = sheet?.let {
+            BusDataParser.findNextBus(it, now.hour, now.minute, toSchool = false)
+        }
 
         provideContent {
             GlanceTheme {
@@ -127,7 +150,7 @@ private fun BusWidgetContent(
                     ColorProvider(SubText, SubTextDark)
                 ),
                 modifier = GlanceModifier
-                    .size(20.dp)
+                    .size(32.dp)
                     .clickable(actionRunCallback<BusRefreshAction>())
             )
         }
@@ -151,6 +174,7 @@ private fun BusWidgetContent(
             nextBus = nextFromSchool,
             accentColor = ColorProvider(AccentOrange, AccentOrangeDark)
         )
+
     }
 }
 
@@ -238,6 +262,12 @@ private fun BusDirectionCard(
 
 class BusWidgetReceiver : GlanceAppWidgetReceiver() {
     override val glanceAppWidget: GlanceAppWidget = BusWidget()
+
+    /** APKインストール・更新後にシステムが呼ぶ → アラームを再起動 */
+    override fun onUpdate(context: Context, appWidgetManager: AppWidgetManager, appWidgetIds: IntArray) {
+        super.onUpdate(context, appWidgetManager, appWidgetIds)
+        WidgetUpdateScheduler.start(context)
+    }
 
     /** 最初のバスウィジェットが追加されたとき → スケジューラ開始 */
     override fun onEnabled(context: Context) {

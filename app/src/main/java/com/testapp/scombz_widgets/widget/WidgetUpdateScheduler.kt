@@ -6,6 +6,7 @@ import android.content.ComponentName
 import android.content.Context
 import android.content.Intent
 import android.os.Build
+import android.util.Log
 
 /**
  * ウィジェットのUI表示を1分ごとに更新するAlarmManagerスケジューラ。
@@ -19,8 +20,8 @@ object WidgetUpdateScheduler {
     /** アラームで送信するIntentのAction */
     const val ACTION_WIDGET_TICK = "com.testapp.scombz_widgets.WIDGET_TICK"
 
+    private const val TAG = "WidgetScheduler"
     private const val REQUEST_CODE = 9001
-    private const val INTERVAL_MS = 60_000L // 1分
 
     /**
      * スケジューラを開始する（最初のウィジェット追加時に呼ぶ）。
@@ -39,31 +40,30 @@ object WidgetUpdateScheduler {
     }
 
     /**
-     * 次の1分後アラームをセットする（WidgetUpdateReceiver内からも呼ばれる）。
+     * 次の「:00秒」ちょうどにアラームをセットする（WidgetUpdateReceiver内からも呼ばれる）。
+     * 現在時刻に関わらず常に次の分の00秒に揃えるため、複数回呼んでも自己補正される。
      */
     fun scheduleNext(context: Context) {
         val am = context.getSystemService(Context.ALARM_SERVICE) as AlarmManager
-        val pi = buildPendingIntent(context) ?: return
-        val triggerAt = System.currentTimeMillis() + INTERVAL_MS
+        val pi = buildPendingIntent(context) ?: run {
+            Log.e(TAG, "scheduleNext: PendingIntent の作成に失敗")
+            return
+        }
+        // 次の :00 秒ちょうどを計算（例: 12:34:45 → 12:35:00）
+        val now = System.currentTimeMillis()
+        val triggerAt = (now / 60_000L + 1L) * 60_000L
 
-        when {
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.S -> {
-                // Android 12+: 正確なアラームが使える場合は使用、そうでなければ不正確アラーム
-                if (am.canScheduleExactAlarms()) {
-                    am.setExactAndAllowWhileIdle(AlarmManager.RTC, triggerAt, pi)
-                } else {
-                    // SCHEDULE_EXACT_ALARM 権限がない場合のフォールバック
-                    // 画面オフ時（Doze）でもなるべく発火する
-                    am.setAndAllowWhileIdle(AlarmManager.RTC, triggerAt, pi)
-                }
-            }
-            Build.VERSION.SDK_INT >= Build.VERSION_CODES.M -> {
-                // Android 6–11: Doze対応の正確アラーム
+        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.S) {
+            if (am.canScheduleExactAlarms()) {
                 am.setExactAndAllowWhileIdle(AlarmManager.RTC, triggerAt, pi)
+                Log.d(TAG, "scheduleNext: 正確なアラームをセット（次の:00秒 = $triggerAt）")
+            } else {
+                am.setAndAllowWhileIdle(AlarmManager.RTC, triggerAt, pi)
+                Log.d(TAG, "scheduleNext: 不正確アラームをセット（権限なし）")
             }
-            else -> {
-                am.setExact(AlarmManager.RTC, triggerAt, pi)
-            }
+        } else {
+            am.setExactAndAllowWhileIdle(AlarmManager.RTC, triggerAt, pi)
+            Log.d(TAG, "scheduleNext: 正確なアラームをセット（次の:00秒 = $triggerAt）")
         }
     }
 
@@ -80,7 +80,14 @@ object WidgetUpdateScheduler {
     }
 
     private fun buildPendingIntent(context: Context, extraFlags: Int = 0): PendingIntent? {
-        val intent = Intent(ACTION_WIDGET_TICK).setPackage(context.packageName)
+        // setComponent() で完全明示的インテントにする。
+        // setPackage() のみの場合 Android 8+ の暗黙的ブロードキャスト制限に引っかかる可能性がある。
+        val intent = Intent(ACTION_WIDGET_TICK).apply {
+            component = ComponentName(
+                context.packageName,
+                WidgetUpdateReceiver::class.java.name
+            )
+        }
         val flags = extraFlags or PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
         return PendingIntent.getBroadcast(context, REQUEST_CODE, intent, flags)
     }
